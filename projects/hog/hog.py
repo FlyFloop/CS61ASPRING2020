@@ -31,19 +31,27 @@ def roll_dice(num_rolls, dice=six_sided):
             dicesums = dicesums + dice
     return dicesums
     # END PROBLEM 1
-
-
 def free_bacon(score):
     """Return the points scored from rolling 0 dice (Free Bacon).
-
     score:  The opponent's current score.
     """
     assert score < 100, 'The game should be over.'
     # BEGIN PROBLEM 2
-    
+    sum = 1
+    digits_sum = 0
+    index = 1
+    for c in str(pow(score, 3)):
+        index += 1
+        tmp = 0
+        if index % 2 == 0:
+            tmp = -int(c)
+        else:
+            tmp = int(c)
+        digits_sum += tmp
+
+    sum = sum + abs(digits_sum)
+    return sum
     # END PROBLEM 2
-
-
 def take_turn(num_rolls, opponent_score, dice=six_sided):
     """Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free Bacon).
     Return the points scored for the turn by the current player.
@@ -58,18 +66,31 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert num_rolls <= 10, 'Cannot roll more than 10 dice.'
     assert opponent_score < 100, 'The game should be over.'
     # BEGIN PROBLEM 3
-    "*** YOUR CODE HERE ***"
+    value = 0
+    if num_rolls == 0:
+        value = free_bacon(opponent_score)
+    else:
+        value = roll_dice(num_rolls,dice)
+    return value
     # END PROBLEM 3
-
 
 def is_swap(player_score, opponent_score):
     """
     Return whether the two scores should be swapped
     """
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 4
 
+    lastScore = pow(3,player_score+opponent_score)
+    lastDigit = lastScore % 10
+    firstDigit = 0
+    while lastScore > 0:
+        firstDigit = lastScore % 10
+        lastScore = lastScore // 10
+    if firstDigit == lastDigit:
+        return True
+    else:
+        return  False
+    # END PROBLEM 4
 
 def other(who):
     """Return the other player, for a player WHO numbered 0 or 1.
