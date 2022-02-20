@@ -21,37 +21,44 @@ def roll_dice(num_rolls, dice=six_sided):
     assert type(num_rolls) == int, 'num_rolls must be an integer.'
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
-    dicesums = 0
-    while num_rolls > 0:
-        num_rolls = num_rolls - 1
-        if dice == 1:
-            dicesums = 1
-            break
-        else:
-            dicesums = dicesums + dice
-    return dicesums
+    "*** YOUR CODE HERE ***"
+
+    sum = 0
+    contains_one = False
+    for num in range(num_rolls):
+        tmp = dice()
+        if tmp == 1: contains_one = True
+        sum = sum + tmp
+    if contains_one: sum = 1
+    return sum
+    
     # END PROBLEM 1
+
+
 def free_bacon(score):
     """Return the points scored from rolling 0 dice (Free Bacon).
+
     score:  The opponent's current score.
     """
     assert score < 100, 'The game should be over.'
     # BEGIN PROBLEM 2
+    "*** YOUR CODE HERE ***"
+
     sum = 1
     digits_sum = 0
     index = 1
-    for c in str(pow(score, 3)):
+    for c in str(pow(score,3)):
         index += 1
         tmp = 0
-        if index % 2 == 0:
-            tmp = -int(c)
-        else:
-            tmp = int(c)
+        if index%2 == 0: tmp = -int(c)
+        else: tmp = int(c)
         digits_sum += tmp
-
+        
     sum = sum + abs(digits_sum)
     return sum
     # END PROBLEM 2
+
+
 def take_turn(num_rolls, opponent_score, dice=six_sided):
     """Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free Bacon).
     Return the points scored for the turn by the current player.
@@ -66,31 +73,30 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert num_rolls <= 10, 'Cannot roll more than 10 dice.'
     assert opponent_score < 100, 'The game should be over.'
     # BEGIN PROBLEM 3
-    value = 0
+    "*** YOUR CODE HERE ***"
+
     if num_rolls == 0:
-        value = free_bacon(opponent_score)
-    else:
-        value = roll_dice(num_rolls,dice)
-    return value
+        res = free_bacon(opponent_score)
+    else: 
+        res = roll_dice(num_rolls, dice);
+    
+    return res
     # END PROBLEM 3
+
 
 def is_swap(player_score, opponent_score):
     """
     Return whether the two scores should be swapped
     """
     # BEGIN PROBLEM 4
+    "*** YOUR CODE HERE ***"
 
-    lastScore = pow(3,player_score+opponent_score)
-    lastDigit = lastScore % 10
-    firstDigit = 0
-    while lastScore > 0:
-        firstDigit = lastScore % 10
-        lastScore = lastScore // 10
-    if firstDigit == lastDigit:
-        return True
-    else:
-        return  False
+    string = str(pow(3, (player_score + opponent_score)))
+    res = (string[0] == string[len(string) - 1])
+
+    return res
     # END PROBLEM 4
+
 
 def other(who):
     """Return the other player, for a player WHO numbered 0 or 1.
@@ -129,10 +135,52 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+
+    score0_add_up = 0 #previous add up for score0
+    score1_add_up = 0 #previous add up for score1
+    tmp0_add_up = 0
+    tmp1_add_up = 0
+    
+    while score0 < goal and score1 < goal:
+        if who == 0:
+            tmp0_add_up = take_turn(strategy0(score0, score1), score1, dice)
+        else:
+            tmp1_add_up = take_turn(strategy1(score1, score0), score0, dice)
+
+        if feral_hogs == True:
+            if who == 0:
+                if abs(score0_add_up - strategy0(score0, score1)) == 2:
+                    score0 += 3
+            else:
+                if abs(score1_add_up - strategy1(score1, score0)) == 2:
+                    score1 += 3
+
+        if who == 0:
+            score0 += tmp0_add_up
+            score0_add_up = tmp0_add_up
+        else:
+            score1 += tmp1_add_up
+            score1_add_up = tmp1_add_up
+
+        if is_swap(score0, score1):
+            tmp = score0
+            score0 = score1
+            score1 = tmp
+        
+        who = other(who)
+
+        
+        def swift():
+            say(score0, score1)
+            return swift
+
+        swift()
+        
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
     "*** YOUR CODE HERE ***"
+    
     # END PROBLEM 6
     return score0, score1
 
@@ -219,6 +267,9 @@ def announce_highest(who, prev_high=0, prev_score=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+
+    
+    return announce_highest
     # END PROBLEM 7
 
 
@@ -367,3 +418,16 @@ def run(*args):
 
     if args.run_experiments:
         run_experiments()
+
+
+def echo_0(s0, s1):
+     print('*', s0)
+     return echo_0
+def echo_1(s0, s1):
+     print('**', s1)
+     return echo_1
+s0, s1 = play(always_roll(1), always_roll(1), dice=make_test_dice(2), goal=3, say=both(echo_0, echo_1))
+
+
+
+
